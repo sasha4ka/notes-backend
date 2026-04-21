@@ -1,7 +1,8 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
-class Note(BaseModel):
+class Note_Read(BaseModel):
     id: int
     author_id: int
     title: str
@@ -15,5 +16,5 @@ class Note_Create(BaseModel):
 
 
 class Note_Update(BaseModel):
-    title: str
-    content: str
+    title: Optional[str] = None
+    content: Optional[str] = None
