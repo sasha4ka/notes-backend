@@ -10,7 +10,6 @@ class Note_Read(BaseModel):
 
 
 class Note_Create(BaseModel):
-    author_id: int
     title: str
     content: str
 

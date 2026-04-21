@@ -7,6 +7,10 @@ class User_Read(BaseModel):
     name: str
     email: str
 
+    @classmethod
+    def from_orm(cls, obj):
+        return cls(id=obj.id, name=obj.name, email=obj.email)
+
 
 class User_Registration(BaseModel):
     name: str
@@ -25,7 +29,7 @@ class User_Registration(BaseModel):
 
 class User_Login(BaseModel):
     email: str
-    password_hash: str
+    password: str
 
 
 class User_Update(BaseModel):
