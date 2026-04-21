@@ -50,7 +50,7 @@ async def update_note(db, note_id: int, note_upd: Note_Update) -> Optional[Note]
 async def delete_note(db, note_id: int) -> bool:
     q = await db.execute(select(Note).where(Note.id == note_id))
     note = q.scalars().first()
-    if not q:
+    if not note:
         return False
     await db.delete(note)
     await db.commit()
