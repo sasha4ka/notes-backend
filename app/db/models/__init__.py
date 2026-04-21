@@ -1,2 +1,2 @@
-from .user import User
-from .note import Note
+from .user import User  # noqa: F401
+from .note import Note  # noqa: F401
