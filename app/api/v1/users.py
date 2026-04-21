@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.dependencies import get_current_user
+from app.core.exceptions import UserAlreadyExistsError
 from app.db.session import get_db
 from app.crud.user import create_user, get_user, get_users, update_user, delete_user, get_user_by_email
 from app.schemas.user import User_Login, User_Read, User_Registration, User_Update
@@ -24,7 +25,10 @@ async def login_user_endpoint(user: User_Login, db: AsyncSession = Depends(get_d
 
 @router.post("/register", response_model=User_Read)
 async def create_user_endpoint(user_create: User_Registration, db: AsyncSession = Depends(get_db)):
-    return await create_user(db, user_create)
+    try:
+        return await create_user(db, user_create)
+    except UserAlreadyExistsError:
+        raise HTTPException(status_code=409, detail="Email already registered")
 
 
 @router.get("/", response_model=list[User_Read])

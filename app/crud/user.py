@@ -1,11 +1,16 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from app.core.exceptions import UserAlreadyExistsError
 from app.core.password import hash_password
 from app.db.models.user import User
 from app.schemas.user import User_Read, User_Registration, User_Update
 
 
 async def create_user(db: AsyncSession, user: User_Registration) -> User:
+    q = await db.execute(select(User).where(User.email == user.email))
+    existing_user = q.scalar_one_or_none()
+    if existing_user:
+        raise UserAlreadyExistsError("Email already registered")
     hashed_password = hash_password(user.password)
     db_user = User(
         name=user.name,
