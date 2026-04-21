@@ -21,9 +21,9 @@ async def get_note(db, note_id: int) -> Note:
     return result.scalars().first()
 
 
-async def create_note(db, note_create: Note_Create) -> Note:
+async def create_note(db, note_create: Note_Create, author_id: int) -> Note:
     note = Note(
-        author_id=note_create.author_id,
+        author_id=author_id,
         title=note_create.title,
         content=note_create.content
     )
