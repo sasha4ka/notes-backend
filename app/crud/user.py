@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core.exceptions import UserAlreadyExistsError
@@ -33,7 +35,7 @@ async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
     return result.scalar_one_or_none()
 
 
-async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100) -> list[User]:
+async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100) -> Sequence[User]:
     result = await db.execute(select(User).offset(skip).limit(limit))
     return result.scalars().all()
 
