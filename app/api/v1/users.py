@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.v1.dependencies import get_current_user
+from app.api.v1.dependencies import get_current_active_user
 from app.core.exceptions import UserAlreadyExistsError
 from app.db.session import get_db
 from app.crud.user import create_user, get_user, get_users, update_user, delete_user, get_user_by_email
@@ -36,20 +36,20 @@ async def read_users_endpoint(
     skip: int = 0,
     limit: int = 100,
     db: AsyncSession = Depends(get_db),
-    current_user: User_Read = Depends(get_current_user)
+    current_user: User_Read = Depends(get_current_active_user)
 ):
     return await get_users(db, skip, limit)
 
 
 @router.get("/me", response_model=User_Read)
-async def read_current_user_endpoint(current_user: User_Read = Depends(get_current_user)):
+async def read_current_user_endpoint(current_user: User_Read = Depends(get_current_active_user)):
     return current_user
 
 
 @router.put("/me", response_model=User_Read)
 async def update_user_endpoint(
     user_update: User_Update,
-    user: User_Read = Depends(get_current_user),
+    user: User_Read = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     user = await update_user(db, user.id, user_update)
@@ -58,7 +58,7 @@ async def update_user_endpoint(
 
 @router.delete("/me")
 async def delete_user_endpoint(
-    user: User_Read = Depends(get_current_user),
+    user: User_Read = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     success = await delete_user(db, user.id)
@@ -71,7 +71,7 @@ async def delete_user_endpoint(
 async def read_user_endpoint(
     user_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User_Read = Depends(get_current_user)
+    current_user: User_Read = Depends(get_current_active_user)
 ):
     user = await get_user(db, user_id)
     if not user:
