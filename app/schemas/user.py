@@ -6,10 +6,11 @@ class User_Read(BaseModel):
     id: int
     name: str
     email: str
+    is_active: bool
 
     @classmethod
     def from_orm(cls, obj):
-        return cls(id=obj.id, name=obj.name, email=obj.email)
+        return cls(id=obj.id, name=obj.name, email=obj.email, is_active=obj.is_active)
 
 
 class User_Registration(BaseModel):

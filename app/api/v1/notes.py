@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.api.v1.dependencies import get_current_user
+from app.api.v1.dependencies import get_current_active_user
 from app.db.session import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.note import create_note, get_note, get_notes, get_notes_by_author, update_note, delete_note
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/v1/notes", tags=["notes"])
 @router.get("/", response_model=list[Note_Read])
 async def read_notes_endpoint(
     db: AsyncSession = Depends(get_db),
-    current_user: User_Read = Depends(get_current_user)
+    current_user: User_Read = Depends(get_current_active_user)
 ):
     return await get_notes(db)
 
@@ -22,7 +22,7 @@ async def read_notes_endpoint(
 async def read_notes_by_author_endpoint(
     author_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User_Read = Depends(get_current_user)
+    current_user: User_Read = Depends(get_current_active_user)
 ):
     return await get_notes_by_author(db, author_id)
 
@@ -31,7 +31,7 @@ async def read_notes_by_author_endpoint(
 async def read_note_endpoint(
     note_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User_Read = Depends(get_current_user)
+    current_user: User_Read = Depends(get_current_active_user)
 ):
     note = await get_note(db, note_id)
     if not note:
@@ -44,7 +44,7 @@ async def put_note_endpoint(
     note_id: int,
     note_update: Note_Update,
     db: AsyncSession = Depends(get_db),
-    current_user: User_Read = Depends(get_current_user)
+    current_user: User_Read = Depends(get_current_active_user)
 ):
     note = await get_note(db, note_id)
     if not note:
@@ -59,7 +59,7 @@ async def put_note_endpoint(
 async def delete_note_endpoint(
     note_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User_Read = Depends(get_current_user)
+    current_user: User_Read = Depends(get_current_active_user)
 ):
     note = await get_note(db, note_id)
     if not note:
@@ -74,6 +74,6 @@ async def delete_note_endpoint(
 async def post_note_endpoint(
     note_create: Note_Create,
     db: AsyncSession = Depends(get_db),
-    current_user: User_Read = Depends(get_current_user)
+    current_user: User_Read = Depends(get_current_active_user)
 ):
     return await create_note(db, note_create, current_user.id)

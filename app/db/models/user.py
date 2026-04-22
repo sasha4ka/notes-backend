@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String
 from app.db.base import Base
 from sqlalchemy.orm import relationship
 
@@ -10,3 +10,4 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     notes = relationship("Note", back_populates="author")
+    is_active = Column(Boolean, nullable=False, default=True)
