@@ -17,5 +17,11 @@ app.add_middleware(
 
 bearer_scheme = HTTPBearer(bearerFormat="JWT", description="Enter: Bearer <token>")
 
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
+
 app.include_router(users_router)
 app.include_router(notes_router)
