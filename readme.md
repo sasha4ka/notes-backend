@@ -34,25 +34,26 @@
 ## Схемы данных (Schemas)
 Пользователь (User)
 ```
-User_Registration: name, email, password (мин. 8 символов).
-User_Read: id, name, email.
-User_Login: email, password.
-User_Update: name (опц.), email (опц.).
+User_Registration: name, email, password (мин. 8 символов)
+User_Read: id, name, email, is_active
+User_Login: email, password
+User_Update: name (опц.), email (опц.)
 ```
 
 Заметка (Note)
 ```
-Note_Create: title, content.
-Note_Read: id, author_id, title, content.
-Note_Update: title (опц.), content (опц.).
+Note_Create: title, content
+Note_Read: id, author_id, title, content
+Note_Update: title (опц.), content (опц.)
 ```
 
 Токен (Token)
 ```
-Token: access_token, token_type (default: "bearer").
+Token: access_token, token_type (default: "bearer")
 ```
 
 ## Безопасность
 
 Для доступа к защищенным маршрутам необходимо передавать JWT токен в заголовке запроса:
 `Authorization: Bearer <your_token>`
+При попытки выполнения действия через отключенного пользователя сервер вернет ошибку `403 Inactive user`
