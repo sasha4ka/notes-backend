@@ -1,7 +1,7 @@
 from typing import Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import Integer, select, text
 from app.core.exceptions import UserAlreadyExistsError
 from app.core.password import hash_password
 from app.db.models.user import User
@@ -17,7 +17,8 @@ async def create_user(db: AsyncSession, user: User_Registration) -> User:
     db_user = User(
         name=user.name,
         email=user.email,
-        hashed_password=hashed_password
+        hashed_password=hashed_password,
+        is_active=1
     )
     db.add(db_user)
     await db.commit()
@@ -49,6 +50,17 @@ async def update_user(db: AsyncSession, user_id: int, user_update: User_Update) 
     for key, value in update_data.items():
         if hasattr(db_user, key):
             setattr(db_user, key, value)
+    await db.commit()
+    await db.refresh(db_user)
+    return db_user
+
+
+async def set_user_active_status(db: AsyncSession, user_id: int, is_active: bool) -> User | None:
+    result = await db.execute(select(User).where(User.id == user_id))
+    db_user = result.scalar_one_or_none()
+    if not db_user:
+        return None
+    db_user.is_active = is_active
     await db.commit()
     await db.refresh(db_user)
     return db_user
