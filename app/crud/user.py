@@ -1,7 +1,7 @@
 from typing import Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import Integer, select, text
+from sqlalchemy import select
 from app.core.exceptions import UserAlreadyExistsError
 from app.core.password import hash_password
 from app.db.models.user import User
