@@ -11,6 +11,24 @@ services:
     ports:
       - ${DB_PORT}:5432
     restart: unless-stopped
+  
+  notes-backend:
+    build: ./
+    container_name: notes_backend
+    environment:
+      DB_HOST: postgres_db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ALGORITHM: ${JWT_ALGORITHM}
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: ${JWT_ACCESS_TOKEN_EXPIRE_MINUTES}
+    ports:
+      - ${BACKEND_PORT}:8000
+    depends_on:
+      - postgres
+    restart: unless-stopped
 
 volumes:
   db-data:
