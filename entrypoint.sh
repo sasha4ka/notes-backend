@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "Waiting for the database to be ready..."
 python wait_for_db.py
