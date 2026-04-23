@@ -36,4 +36,4 @@ class User_Login(BaseModel):
 
 class User_Update(BaseModel):
     name: Optional[str] = None
-    email: Optional[str] = None
+    is_active: Optional[bool] = None

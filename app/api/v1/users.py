@@ -54,6 +54,8 @@ async def update_user_endpoint(
     user: User_Read = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
+    if user_update.is_active is not None and not user.is_admin:
+        raise HTTPException(status_code=403, detail="Only admins can change active status")
     user = await update_user(db, user.id, user_update)
     return user
 
@@ -79,3 +81,35 @@ async def read_user_endpoint(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+@router.put("/{user_id}", response_model=User_Read)
+async def update_user_by_id_endpoint(
+    user_id: int,
+    user_update: User_Update,
+    db: AsyncSession = Depends(get_db),
+    current_user: User_Read = Depends(get_current_active_user)
+):
+    user = await get_user(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user_id != current_user.id and not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not authorized to update this user")
+    if user_update.is_active is not None and not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Only admins can change active status")
+    user = await update_user(db, user_id, user_update)
+    return user
+
+
+@router.delete("/{user_id}")
+async def delete_user_by_id_endpoint(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User_Read = Depends(get_current_active_user)
+):
+    if user_id != current_user.id and not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this user")
+    success = await delete_user(db, user_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User deleted successfully"}
