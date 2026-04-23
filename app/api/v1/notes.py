@@ -36,6 +36,17 @@ async def read_notes_by_author_endpoint(
     return notes
 
 
+@router.get("/my", response_model=list[Note_Read])
+async def read_my_notes_endpoint(
+    db: AsyncSession = Depends(get_db),
+    current_user: User_Read = Depends(get_current_active_user)
+):
+    notes = await get_notes_by_author(db, current_user.id)
+    if not notes:
+        raise HTTPException(status_code=404, detail="No notes found for this author")
+    return notes
+
+
 @router.get("/{note_id}", response_model=Note_Read)
 async def read_note_endpoint(
     note_id: int,
