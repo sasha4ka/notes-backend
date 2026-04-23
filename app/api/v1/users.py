@@ -122,7 +122,9 @@ async def change_password_endpoint(
     db: AsyncSession = Depends(get_db),
     current_user: User_Read = Depends(get_current_active_user)
 ):
-    return await change_password(db, current_user.id, password_change)
+    if not await change_password(db, current_user.id, password_change):
+        raise HTTPException(status_code=400, detail="Failed to change password")
+    return {"message": "Password changed successfully"}
 
 
 @router.post("/{user_id}/change-password")
@@ -134,4 +136,6 @@ async def change_password_by_id_endpoint(
 ):
     if user_id != current_user.id and not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Not authorized to change this user's password")
-    return await change_password(db, user_id, password_change)
+    if not await change_password(db, user_id, password_change):
+        raise HTTPException(status_code=400, detail="Failed to change password")
+    return {"message": "Password changed successfully"}
