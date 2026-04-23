@@ -55,6 +55,25 @@ async def update_user(db: AsyncSession, user_id: int, user_update: User_Update) 
     return db_user
 
 
+async def set_user_admin_status(db: AsyncSession, user_id: int, is_admin: bool) -> User | None:
+    result = await db.execute(select(User).where(User.id == user_id))
+    db_user = result.scalar_one_or_none()
+    if not db_user:
+        return None
+    db_user.is_admin = is_admin
+    await db.commit()
+    await db.refresh(db_user)
+    return db_user
+
+
+async def is_user_admin(db: AsyncSession, user_id: int) -> bool | None:
+    result = await db.execute(select(User).where(User.id == user_id))
+    db_user = result.scalar_one_or_none()
+    if not db_user:
+        return None
+    return db_user.is_admin
+
+
 async def set_user_active_status(db: AsyncSession, user_id: int, is_active: bool) -> User | None:
     result = await db.execute(select(User).where(User.id == user_id))
     db_user = result.scalar_one_or_none()
