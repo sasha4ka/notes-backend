@@ -55,6 +55,25 @@ async def update_user(db: AsyncSession, user_id: int, user_update: User_Update) 
     return db_user
 
 
+async def increment_user_token_version(db: AsyncSession, user_id: int) -> User | None:
+    result = await db.execute(select(User).where(User.id == user_id))
+    db_user = result.scalar_one_or_none()
+    if not db_user:
+        return None
+    db_user.token_version += 1
+    await db.commit()
+    await db.refresh(db_user)
+    return db_user
+
+
+async def get_user_token_version(db: AsyncSession, user_id: int) -> int | None:
+    result = await db.execute(select(User).where(User.id == user_id))
+    db_user = result.scalar_one_or_none()
+    if not db_user:
+        return None
+    return db_user.token_version
+
+
 async def set_user_admin_status(db: AsyncSession, user_id: int, is_admin: bool) -> User | None:
     result = await db.execute(select(User).where(User.id == user_id))
     db_user = result.scalar_one_or_none()
@@ -103,6 +122,7 @@ async def change_password(db: AsyncSession, user_id: int, password_change: User_
     if not verify_password(password_change.old_password, db_user.hashed_password):
         return False
     db_user.hashed_password = hash_password(password_change.new_password)
+    db_user.token_version = db_user.token_version + 1
     await db.commit()
     await db.refresh(db_user)
     return True

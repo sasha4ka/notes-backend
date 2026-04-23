@@ -12,3 +12,4 @@ class User(Base):
     notes = relationship("Note", back_populates="author")
     is_active = Column(Boolean, nullable=False, default=True)
     is_admin = Column(Boolean, nullable=False, default=False)
+    token_version = Column(Integer, nullable=False, default=0)

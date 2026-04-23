@@ -22,6 +22,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
     user = await get_user_by_email(db, email)
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+    actual_token_version = user.token_version if user.token_version is not None else 0
+    if payload.get("token_version") != actual_token_version:
+        raise HTTPException(status_code=401, detail="Token has been revoked")
     return User_Read.from_orm(user)
 
 

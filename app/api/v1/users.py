@@ -21,7 +21,8 @@ async def login_user_endpoint(user: User_Login, db: AsyncSession = Depends(get_d
         raise HTTPException(status_code=401, detail="Invalid email or password")
     if not db_user.is_active:
         raise HTTPException(status_code=403, detail="Inactive user")
-    access_token = create_access_token(data={"sub": db_user.email})
+    token_version = db_user.token_version if db_user.token_version is not None else 0
+    access_token = create_access_token(data={"sub": db_user.email}, token_version=token_version)
     return Token(access_token=access_token, token_type="bearer")
 
 
