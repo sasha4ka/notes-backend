@@ -11,3 +11,4 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     notes = relationship("Note", back_populates="author")
     is_active = Column(Boolean, nullable=False, default=True)
+    is_admin = Column(Boolean, nullable=False, default=False)
