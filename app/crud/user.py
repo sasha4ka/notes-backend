@@ -3,9 +3,9 @@ from typing import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core.exceptions import UserAlreadyExistsError
-from app.core.password import hash_password
+from app.core.password import hash_password, verify_password
 from app.db.models.user import User
-from app.schemas.user import User_Read, User_Registration, User_Update
+from app.schemas.user import User_Change_Password, User_Read, User_Registration, User_Update
 
 
 async def create_user(db: AsyncSession, user: User_Registration) -> User:
@@ -93,3 +93,16 @@ async def delete_user(db: AsyncSession, user_id: int) -> bool:
         await db.commit()
         return True
     return False
+
+
+async def change_password(db: AsyncSession, user_id: int, password_change: User_Change_Password) -> bool:
+    result = await db.execute(select(User).where(User.id == user_id))
+    db_user = result.scalar_one_or_none()
+    if not db_user:
+        return False
+    if not verify_password(password_change.old_password, db_user.hashed_password):
+        return False
+    db_user.hashed_password = hash_password(password_change.new_password)
+    await db.commit()
+    await db.refresh(db_user)
+    return True

@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.v1.dependencies import get_current_active_user
 from app.core.exceptions import UserAlreadyExistsError
 from app.db.session import get_db
-from app.crud.user import create_user, get_user, get_users, update_user, delete_user, get_user_by_email
-from app.schemas.user import User_Login, User_Read, User_Registration, User_Update
+from app.crud.user import change_password, create_user, get_user, get_users, update_user, delete_user, get_user_by_email
+from app.schemas.user import User_Change_Password, User_Login, User_Read, User_Registration, User_Update
 from app.schemas.token import Token
 from app.core.password import verify_password
 from app.core.auth import create_access_token
@@ -113,3 +113,24 @@ async def delete_user_by_id_endpoint(
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "User deleted successfully"}
+
+
+@router.post("/me/change-password")
+async def change_password_endpoint(
+    password_change: User_Change_Password,
+    db: AsyncSession = Depends(get_db),
+    current_user: User_Read = Depends(get_current_active_user)
+):
+    return await change_password(db, current_user.id, password_change)
+
+
+@router.post("/{user_id}/change-password")
+async def change_password_by_id_endpoint(
+    user_id: int,
+    password_change: User_Change_Password,
+    db: AsyncSession = Depends(get_db),
+    current_user: User_Read = Depends(get_current_active_user)
+):
+    if user_id != current_user.id and not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not authorized to change this user's password")
+    return await change_password(db, user_id, password_change)

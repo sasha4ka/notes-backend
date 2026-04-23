@@ -37,3 +37,17 @@ class User_Login(BaseModel):
 class User_Update(BaseModel):
     name: Optional[str] = None
     is_active: Optional[bool] = None
+
+
+class User_Change_Password(BaseModel):
+    old_password: str
+    new_password: str
+
+    @field_validator("new_password")
+    def password_rules(cls, v: str) -> str:
+        b_len = len(v.encode("utf-8"))
+        if b_len > 72:
+            raise ValueError("password must be at most 72 bytes (UTF-8)")
+        if len(v) < 8:
+            raise ValueError("password must be at least 8 characters")
+        return v
