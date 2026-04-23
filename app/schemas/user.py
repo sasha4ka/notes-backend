@@ -1,11 +1,11 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional
 
 
 class User_Read(BaseModel):
     id: int
     name: str
-    email: str
+    email: EmailStr
     is_active: bool
     is_admin: bool
 
@@ -15,8 +15,8 @@ class User_Read(BaseModel):
 
 
 class User_Registration(BaseModel):
-    name: str
-    email: str
+    name: str = Field(..., max_length=255)
+    email: EmailStr = Field(..., max_length=255)
     password: str
 
     @field_validator("password")
@@ -26,16 +26,20 @@ class User_Registration(BaseModel):
             raise ValueError("password must be at most 72 bytes (UTF-8)")
         if len(v) < 8:
             raise ValueError("password must be at least 8 characters")
+        if v.isascii():
+            raise ValueError("password must contain at least one non-ASCII character")
+        if v == v.lower() or v == v.upper():
+            raise ValueError("password must contain both uppercase and lowercase characters")
         return v
 
 
 class User_Login(BaseModel):
-    email: str
+    email: str = Field(..., max_length=255)
     password: str
 
 
 class User_Update(BaseModel):
-    name: Optional[str] = None
+    name: Optional[str] = Field(..., max_length=255)
     is_active: Optional[bool] = None
 
 
@@ -50,4 +54,8 @@ class User_Change_Password(BaseModel):
             raise ValueError("password must be at most 72 bytes (UTF-8)")
         if len(v) < 8:
             raise ValueError("password must be at least 8 characters")
+        if v.isascii():
+            raise ValueError("password must contain at least one non-ASCII character")
+        if v == v.lower() or v == v.upper():
+            raise ValueError("password must contain both uppercase and lowercase characters")
         return v
