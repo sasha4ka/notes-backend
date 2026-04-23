@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 
@@ -10,10 +10,10 @@ class Note_Read(BaseModel):
 
 
 class Note_Create(BaseModel):
-    title: str
-    content: str
+    title: str = Field(..., max_length=255)
+    content: str = Field(..., max_length=8000)
 
 
 class Note_Update(BaseModel):
-    title: Optional[str] = None
-    content: Optional[str] = None
+    title: Optional[str] = Field(None, max_length=255)
+    content: Optional[str] = Field(None, max_length=8000)
